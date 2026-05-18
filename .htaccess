@@ -1,0 +1,7 @@
+RewriteEngine On
+
+RewriteRule ^api/comments/?$ controllers/CommentController.php [L,QSA]
+
+RewriteRule ^api/comments/([0-9]+)$ controllers/CommentController.php?id=$1 [L,QSA]
+
+RewriteRule ^api/activity/?$ controllers/ActivityController.php [L,QSA]
