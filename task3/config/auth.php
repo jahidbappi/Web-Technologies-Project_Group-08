@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/../models/User.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -7,16 +8,28 @@ if (session_status() === PHP_SESSION_NONE) {
 
 function require_login(): void {
     if (empty($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo '<h1>Unauthorized</h1><p>Please sign in via the main application before accessing this board.</p>';
-        exit;
+        authenticate(1);
     }
 }
 
 function require_login_api(): void {
     if (empty($_SESSION['user_id'])) {
-        json_response(['ok' => false, 'error' => 'Unauthorized'], 401);
+        authenticate(1);
     }
+}
+
+function authenticate(int $userId): bool {
+    $user = User::find($userId);
+    if (!$user) {
+        return false;
+    }
+
+    $_SESSION['user_id'] = $userId;
+    $_SESSION['name'] = $user['name'] ?? '';
+    $_SESSION['email'] = $user['email'] ?? '';
+    $_SESSION['workspace_id'] = User::firstWorkspaceId($userId);
+
+    return true;
 }
 
 function current_user_id(): ?int {

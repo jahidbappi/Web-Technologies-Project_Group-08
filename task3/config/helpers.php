@@ -53,5 +53,10 @@ function route(string $name, array $params = []): string {
 
 /** Static asset path relative to index.php (CSS / JS). */
 function asset(string $path): string {
-    return ltrim(str_replace('\\', '/', $path), '/');
+    $path = ltrim(str_replace('\\', '/', $path), '/');
+    $filePath = __DIR__ . '/../' . $path;
+    if (file_exists($filePath)) {
+        return $path . '?v=' . filemtime($filePath);
+    }
+    return $path;
 }

@@ -76,31 +76,13 @@
                 <textarea id="t-desc" name="description" rows="3"><?= e($old['description'] ?? '') ?></textarea>
             </div>
 
-            <div class="field-row">
-                <div class="field">
-                    <label for="t-assign">Assigned to</label>
-                    <select id="t-assign" name="assigned_to">
-                        <option value="">— Unassigned —</option>
-                        <?php foreach ($members as $m): ?>
-                            <option value="<?= e($m['id']) ?>"
-                                <?= ((int)($old['assigned_to'] ?? 0) === (int)$m['id']) ? 'selected' : '' ?>>
-                                <?= e($m['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <?php if (!empty($errors['assigned_to'])): ?>
-                        <small class="field__error"><?= e($errors['assigned_to']) ?></small>
-                    <?php endif; ?>
-                </div>
-
-                <div class="field">
-                    <label for="t-due">Due date <span class="req">*</span></label>
-                    <input id="t-due" type="date" name="due_date" required
-                           value="<?= e($old['due_date'] ?? '') ?>">
-                    <?php if (!empty($errors['due_date'])): ?>
-                        <small class="field__error"><?= e($errors['due_date']) ?></small>
-                    <?php endif; ?>
-                </div>
+            <div class="field">
+                <label for="t-due">Due date <span class="req">*</span></label>
+                <input id="t-due" type="date" name="due_date" required
+                       value="<?= e($old['due_date'] ?? '') ?>">
+                <?php if (!empty($errors['due_date'])): ?>
+                    <small class="field__error"><?= e($errors['due_date']) ?></small>
+                <?php endif; ?>
             </div>
 
             <fieldset class="field">
@@ -108,8 +90,8 @@
                 <div class="radio-row">
                     <?php foreach (\Task::PRIORITIES as $p): ?>
                         <label class="radio radio--<?= e($p) ?>">
-                            <input type="radio" name="priority" value="<?= e($p) ?>"
-                                <?= (($old['priority'] ?? '') === $p) ? 'checked' : '' ?>>
+                            <input type="radio" name="priority" value="<?= e($p) ?>" required
+                                <?= (($old['priority'] ?? 'medium') === $p) ? 'checked' : '' ?>>
                             <span><?= e(ucfirst($p)) ?></span>
                         </label>
                     <?php endforeach; ?>

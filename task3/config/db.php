@@ -14,8 +14,10 @@ const DB_PASS = '';
 
 /** Tried first, then DB_PORTS_FALLBACK. Override via TASK3_DB_PORTS="3307,3308" if needed. */
 const DB_PORT_PRIMARY = 3306;
-
 const DB_PORTS_FALLBACK = [3307, 3306];
+
+/** Local XAMPP socket fallback if TCP ports are unavailable. */
+const DB_SOCKET = '/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock';
 
 function db(): PDO {
     static $pdo = null;
@@ -40,6 +42,21 @@ function db(): PDO {
         }
         $dsn = 'mysql:host=' . DB_HOST . ';port=' . $port . ';dbname=' . DB_NAME . ';charset=utf8mb4';
         try {
+            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ]);
+            return $pdo;
+        } catch (PDOException $e) {
+            $lastException = $e;
+        }
+    }
+
+    $socket = getenv('TASK3_DB_SOCKET') ?: DB_SOCKET;
+    if ($socket && file_exists($socket) && is_readable($socket)) {
+        try {
+            $dsn = 'mysql:unix_socket=' . $socket . ';dbname=' . DB_NAME . ';charset=utf8mb4';
             $pdo = new PDO($dsn, DB_USER, DB_PASS, [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

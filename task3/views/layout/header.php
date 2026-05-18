@@ -20,11 +20,6 @@
         <?php if (!empty($_SESSION['user_id'])): ?>
             <nav class="topbar__nav">
                 <a class="nav-pill" href="<?= e(route('projects')) ?>">Projects</a>
-                <span class="topbar__user">
-                    <span class="topbar__avatar"><?= e(initials($_SESSION['name'] ?? '?')) ?></span>
-                    <span class="topbar__name"><?= e($_SESSION['name'] ?? '') ?></span>
-                </span>
-                <a class="btn btn--ghost btn--sm" href="<?= e(route('logout')) ?>">Sign out</a>
             </nav>
         <?php endif; ?>
     </div>
