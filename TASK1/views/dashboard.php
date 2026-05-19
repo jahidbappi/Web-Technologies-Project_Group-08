@@ -1,5 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once dirname(__DIR__, 2) . '/config/app.php';
+app_session_start();
 require_once 'config/helpers.php';
 require_once 'models/WorkspaceModel.php';
 requireAuth();
@@ -63,6 +64,9 @@ $isOwner       = ((int)$workspace['owner_id'] === $userId);
     </a>
     <a href="index.php?page=join_workspace" class="navbar-action-btn">
       + Join Workspace
+    </a>
+    <a href="<?= htmlspecialchars(app_url('task3/index.php?route=projects')) ?>" class="navbar-action-btn">
+      Task Board
     </a>
     <?php if ($isOwner): ?>
       <a href="index.php?page=workspace_settings" class="navbar-action-btn navbar-action-btn--ghost">
