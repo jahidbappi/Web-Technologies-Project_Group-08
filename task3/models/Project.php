@@ -29,8 +29,8 @@ class Project {
      * Board access: any member of the project's workspace (P8 checklist).
      * project_members is used for the assignee dropdown, not for locking the board.
      */
-    public static function userCanAccess(int $projectId, int $userId): bool {
-        $project = self::find($projectId);
+    public static function userCanAccess(int $projectId, int $userId, ?array $project = null): bool {
+        $project = $project ?? self::find($projectId);
         if (!$project || $project['workspace_id'] === null) {
             return false;
         }
@@ -41,14 +41,15 @@ class Project {
              LIMIT 1'
         );
         $stmt->execute([':wid' => $project['workspace_id'], ':uid' => $userId]);
-        if ((bool)$stmt->fetch()) {
-            return true;
-        }
-
-        return User::isFallbackUser($userId) && $project['workspace_id'] === 1;
+        return (bool)$stmt->fetch();
     }
 
-    public static function members(int $projectId): array {
+    public static function members(int $projectId, ?array $project = null): array {
+        $project = $project ?? self::find($projectId);
+        if (!$project) {
+            return [];
+        }
+
         $stmt = db()->prepare(
             'SELECT u.id, u.name, u.email
                FROM project_members pm
@@ -59,28 +60,16 @@ class Project {
         $stmt->execute([':pid' => $projectId]);
         $members = $stmt->fetchAll();
 
-        $project = self::find($projectId);
-        if ($project && $project['workspace_id'] === 1) {
-            $existingIds = array_column($members, 'id');
-            foreach (User::fallbackUsers() as $fallback) {
-                if (!in_array($fallback['id'], $existingIds, true)) {
-                    $members[] = $fallback;
-                }
-            }
-        }
-
-        if (!$members) {
-            if ($project) {
-                $stmt = db()->prepare(
-                    'SELECT u.id, u.name, u.email
-                       FROM workspace_members wm
-                       JOIN users u ON u.id = wm.user_id
-                      WHERE wm.workspace_id = :wid
-                      ORDER BY u.name ASC'
-                );
-                $stmt->execute([':wid' => $project['workspace_id']]);
-                $members = $stmt->fetchAll();
-            }
+        if (!$members && !empty($project['workspace_id'])) {
+            $stmt = db()->prepare(
+                'SELECT u.id, u.name, u.email
+                   FROM workspace_members wm
+                   JOIN users u ON u.id = wm.user_id
+                  WHERE wm.workspace_id = :wid
+                  ORDER BY u.name ASC'
+            );
+            $stmt->execute([':wid' => $project['workspace_id']]);
+            $members = $stmt->fetchAll();
         }
 
         return $members;

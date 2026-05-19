@@ -174,6 +174,13 @@ CREATE TABLE `workspaces` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `workspaces`
+--
+
+INSERT INTO `workspaces` (`id`, `name`, `description`, `owner_id`, `invite_code`, `created_at`) VALUES
+(1, 'Group 08 Workspace', 'Shared workspace for Mim, sinha, and mohini', 1, 'GRP08A', '2026-05-16 02:10:00');
+
 -- --------------------------------------------------------
 
 --
@@ -195,6 +202,20 @@ INSERT INTO `workspace_members` (`id`, `workspace_id`, `user_id`, `joined_at`) V
 (1, 1, 1, '2026-05-16 02:10:15'),
 (2, 1, 2, '2026-05-16 02:10:40'),
 (3, 1, 3, '2026-05-16 02:10:51');
+
+--
+-- Dumping data for table `tasks`
+--
+
+INSERT INTO `tasks` (`id`, `project_id`, `title`, `description`, `assigned_to`, `priority`, `due_date`, `status`, `created_at`) VALUES
+(1, 12, 'Water sensor calibration', 'Calibrate pH and turbidity sensors', 1, 'high', '2026-05-25', 'todo', '2026-05-17 10:00:00'),
+(2, 13, 'Design recycling-bin UI', 'Initial mockups for the dashboard', 3, 'medium', '2026-05-22', 'todo', '2026-05-17 10:01:00'),
+(3, 13, 'Set up routes & DB models', 'Skeleton MVC scaffolding', 3, 'high', '2026-05-15', 'in-progress', '2026-05-17 10:02:00'),
+(4, 13, 'Project kickoff doc', 'Draft the project brief', 3, 'low', '2026-05-12', 'done', '2026-05-17 10:03:00'),
+(5, 14, 'Map provider integration', 'Compare Mapbox vs Google Maps APIs', 2, 'high', '2026-06-01', 'todo', '2026-05-17 10:04:00'),
+(6, 14, 'Safety-score algorithm', 'Weighting of crime + lighting + traffic', 3, 'high', '2026-05-28', 'in-progress', '2026-05-17 10:05:00'),
+(7, 15, 'Reminder push notifications', 'Web push + email fallback', 2, 'medium', '2026-06-10', 'todo', '2026-05-17 10:06:00'),
+(8, 15, 'Medicine catalog importer', 'Seed common medications', 2, 'medium', '2026-05-25', 'in-progress', '2026-05-17 10:07:00');
 
 --
 -- Indexes for dumped tables
@@ -280,7 +301,7 @@ ALTER TABLE `project_members`
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -292,7 +313,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `workspaces`
 --
 ALTER TABLE `workspaces`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `workspace_members`

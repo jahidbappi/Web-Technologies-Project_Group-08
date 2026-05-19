@@ -163,9 +163,31 @@
 
     if (openBtn) openBtn.addEventListener('click', openModal);
     if (modal) {
-        modal.addEventListener('click', (ev) => {
-            if (ev.target.matches('[data-close-modal]')) closeModal();
+        const panel = modal.querySelector('.modal__panel');
+        const backdrop = modal.querySelector('.modal__backdrop');
+        const form = modal.querySelector('form');
+
+        if (panel) {
+            panel.addEventListener('click', (ev) => ev.stopPropagation());
+        }
+        if (backdrop) {
+            backdrop.addEventListener('click', closeModal);
+        }
+        modal.querySelectorAll('[data-close-modal]').forEach((el) => {
+            if (el === backdrop) return;
+            el.addEventListener('click', closeModal);
         });
+
+        if (form) {
+            form.addEventListener('submit', () => {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Creating…';
+                }
+            });
+        }
+
         document.addEventListener('keydown', (ev) => {
             if (ev.key === 'Escape' && modal.hasAttribute('data-open')) closeModal();
         });

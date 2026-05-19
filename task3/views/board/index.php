@@ -17,6 +17,11 @@
         </button>
     </header>
 
+    <?php if (!empty($_SESSION['flash_error'])): ?>
+        <div class="alert alert--error"><?= e($_SESSION['flash_error']) ?></div>
+        <?php unset($_SESSION['flash_error']); ?>
+    <?php endif; ?>
+
     <?php if (!empty($flash_ok)): ?>
         <div class="alert alert--ok"><?= e($flash_ok) ?></div>
     <?php endif; ?>
@@ -59,7 +64,7 @@
             <h2 id="new-task-title">Create a new task</h2>
             <button type="button" class="modal__close" data-close-modal aria-label="Close">&times;</button>
         </header>
-        <form method="post" action="<?= e(route('task_create')) ?>" class="form form--modal" novalidate>
+        <form method="post" action="<?= e(route('task_create')) ?>" class="form form--modal" id="new-task-form">
             <input type="hidden" name="project_id" value="<?= e($project['id']) ?>">
 
             <div class="field">
@@ -109,6 +114,6 @@
     </div>
 </div>
 
-<script src="<?= e(asset('public/js/board.js')) ?>"></script>
+<script src="<?= e(asset('public/js/board.js')) ?>" defer></script>
 
 <?php require __DIR__ . '/../layout/footer.php'; ?>

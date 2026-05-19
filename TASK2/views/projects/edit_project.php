@@ -10,7 +10,11 @@ $result = $model->getProjectById($id);
 
 $project = $result->fetch_assoc();
 
-$wsId = current_workspace_id() ?? (int)($project['workspace_id'] ?? 1);
+$wsId = (int)($project['workspace_id'] ?? current_workspace_id() ?? 0);
+if ($wsId < 1) {
+    header('Location: ' . app_url('TASK1/index.php?page=choose_workspace'));
+    exit();
+}
 $workspace_members = $model->getWorkspaceMembers($wsId);
 
 $current_members =

@@ -65,7 +65,7 @@ $isOwner       = ((int)$workspace['owner_id'] === $userId);
     <a href="index.php?page=join_workspace" class="navbar-action-btn">
       + Join Workspace
     </a>
-    <a href="<?= htmlspecialchars(app_url('task3/index.php?route=projects')) ?>" class="navbar-action-btn">
+    <a href="<?= htmlspecialchars(app_url('task3/index.php?route=projects')) ?>" class="navbar-action-btn" target="_self">
       Task Board
     </a>
     <?php if ($isOwner): ?>

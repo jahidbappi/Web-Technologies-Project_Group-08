@@ -61,7 +61,11 @@ if(
     !isset($_POST['update_project'])
 )
 {
-    $workspace_id = current_workspace_id() ?? 1;
+    $workspace_id = current_workspace_id();
+    if (!$workspace_id) {
+        header('Location: ' . app_url('TASK1/index.php?page=choose_workspace'));
+        exit();
+    }
 
     $project_name = $_POST['project_name'];
 
