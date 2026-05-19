@@ -1,6 +1,7 @@
 <?php
 
-session_start();
+require_once __DIR__ . '/../config/app.php';
+app_session_start();
 
 $page = $_GET['page'] ?? 'login';
 
