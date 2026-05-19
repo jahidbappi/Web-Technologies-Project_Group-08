@@ -17,17 +17,32 @@ class Task {
     }
 
     public static function forProjectByStatus(int $projectId, string $status): array {
+        $all = self::forProjectGrouped($projectId);
+        return $all[$status] ?? [];
+    }
+
+    /** One query for the whole board (faster than 3 separate status queries). */
+    public static function forProjectGrouped(int $projectId): array {
+        $columns = array_fill_keys(self::STATUSES, []);
+
         $stmt = db()->prepare(
             'SELECT t.*, u.name AS assignee_name
                FROM tasks t
           LEFT JOIN users u ON u.id = t.assigned_to
-              WHERE t.project_id = :pid AND t.status = :status
+              WHERE t.project_id = :pid
            ORDER BY t.created_at ASC, t.id ASC'
         );
-        $stmt->execute([':pid' => $projectId, ':status' => $status]);
-        $rows = $stmt->fetchAll();
+        $stmt->execute([':pid' => $projectId]);
 
-        return array_map([self::class, 'normalizeAssignee'], $rows);
+        while ($row = $stmt->fetch()) {
+            $status = $row['status'];
+            if (!isset($columns[$status])) {
+                continue;
+            }
+            $columns[$status][] = self::normalizeAssignee($row);
+        }
+
+        return $columns;
     }
 
     public static function find(int $id): ?array {
@@ -59,15 +74,14 @@ class Task {
              VALUES
                 (:project_id, :title, :description, :assigned_to, :priority, :due_date, :status, NOW())'
         );
-        $stmt->execute([
-            ':project_id'  => $data['project_id'],
-            ':title'       => $data['title'],
-            ':description' => $data['description'],
-            ':assigned_to' => $data['assigned_to'],
-            ':priority'    => $data['priority'],
-            ':due_date'    => $data['due_date'],
-            ':status'      => $data['status'],
-        ]);
+        $stmt->bindValue(':project_id', $data['project_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':title', $data['title'], PDO::PARAM_STR);
+        $stmt->bindValue(':description', $data['description'], $data['description'] === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+        $stmt->bindValue(':assigned_to', $data['assigned_to'], $data['assigned_to'] === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+        $stmt->bindValue(':priority', $data['priority'], PDO::PARAM_STR);
+        $stmt->bindValue(':due_date', $data['due_date'], PDO::PARAM_STR);
+        $stmt->bindValue(':status', $data['status'], PDO::PARAM_STR);
+        $stmt->execute();
         return (int)db()->lastInsertId();
     }
 

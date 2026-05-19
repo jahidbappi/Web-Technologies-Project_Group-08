@@ -33,6 +33,9 @@ unset($_SESSION['errors'], $_SESSION['old']);
       <?php endif; ?>
 
       <form method="post" action="index.php?page=do_login">
+        <?php if (!empty($_GET['return'])): ?>
+          <input type="hidden" name="return" value="<?= htmlspecialchars($_GET['return']) ?>">
+        <?php endif; ?>
 
         <div class="form-group">
           <label for="email">Email address</label>

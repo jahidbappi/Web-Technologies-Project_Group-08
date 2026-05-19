@@ -14,17 +14,14 @@ class TaskController {
             echo 'Project not found.';
             return;
         }
-        if (!Project::userCanAccess($projectId, current_user_id())) {
+        if (!Project::userCanAccess($projectId, current_user_id(), $project)) {
             $_SESSION['flash_error'] = 'You are not a member of this project\'s workspace.';
             header('Location: ' . route('projects'));
             exit;
         }
 
-        $columns = [];
-        foreach (Task::STATUSES as $status) {
-            $columns[$status] = Task::forProjectByStatus($projectId, $status);
-        }
-        $members = Project::members($projectId);
+        $columns = Task::forProjectGrouped($projectId);
+        $members = Project::members($projectId, $project);
 
         $errors    = $_SESSION['task_errors']    ?? [];
         $old       = $_SESSION['task_old']       ?? [];
@@ -45,9 +42,10 @@ class TaskController {
         $priority    = (string)($_POST['priority'] ?? '');
         $dueDate     = trim((string)($_POST['due_date'] ?? ''));
 
-        if (!Project::userCanAccess($projectId, current_user_id())) {
+        $project = Project::find($projectId);
+        if (!$project || !Project::userCanAccess($projectId, current_user_id(), $project)) {
             $_SESSION['flash_error'] = 'You are not a member of this project\'s workspace.';
-            header('Location: ' . route('projects'));
+            header('Location: ' . route('board', ['project_id' => $projectId]));
             exit;
         }
 
@@ -95,11 +93,15 @@ class TaskController {
             'status'      => 'todo',
         ]);
 
-        log_activity(
-            $projectId,
-            current_user_id(),
-            "Task '{$title}' created"
-        );
+        try {
+            log_activity(
+                $projectId,
+                current_user_id(),
+                "Task '{$title}' created"
+            );
+        } catch (Throwable $e) {
+            error_log('activity log failed: ' . $e->getMessage());
+        }
 
         $_SESSION['flash_ok'] = "Task #{$newId} created.";
         header('Location: ' . route('board', ['project_id' => $projectId]));

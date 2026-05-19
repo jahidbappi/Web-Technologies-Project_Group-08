@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/db.php';
 
 function log_activity(int $project_id, int $user_id, string $action_text): void {
+    require_once __DIR__ . '/db.php';
     $stmt = db()->prepare(
         'INSERT INTO activity_logs (project_id, user_id, action_text, created_at)
          VALUES (:project_id, :user_id, :action_text, NOW())'
@@ -19,7 +19,9 @@ function e($v): string {
 
 function initials(?string $name): string {
     $name = trim((string)$name);
-    if ($name === '') return '?';
+    if ($name === '') {
+        return '?';
+    }
     $parts = preg_split('/\s+/', $name);
     $first = mb_substr($parts[0], 0, 1);
     $last  = count($parts) > 1 ? mb_substr(end($parts), 0, 1) : '';
@@ -41,11 +43,6 @@ function json_response(array $data, int $code = 200): void {
     exit;
 }
 
-/**
- * Front-controller URL — always hits index.php so the app works when opened as
- * http://localhost/WebTechProject/task3/index.php
- * without Apache rewrite rules.
- */
 function route(string $name, array $params = []): string {
     if (!function_exists('task3_route')) {
         require_once dirname(__DIR__, 2) . '/config/app.php';
@@ -53,7 +50,6 @@ function route(string $name, array $params = []): string {
     return task3_route($name, $params);
 }
 
-/** Static asset path relative to index.php (CSS / JS). */
 function asset(string $path): string {
     $path = ltrim(str_replace('\\', '/', $path), '/');
     $filePath = __DIR__ . '/../' . $path;

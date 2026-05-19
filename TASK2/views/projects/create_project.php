@@ -4,7 +4,11 @@ require_once __DIR__ . '/../../models/ProjectModel.php';
 
 $model = new ProjectModel();
 
-$wsId = current_workspace_id() ?? 1;
+$wsId = current_workspace_id();
+if (!$wsId) {
+    header('Location: ' . app_url('TASK1/index.php?page=choose_workspace'));
+    exit();
+}
 $members = $model->getWorkspaceMembers($wsId);
 
 $errors = [];

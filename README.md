@@ -1,39 +1,35 @@
-# Web Technologies Project — Group 08 (Merged)
+# Web Technologies Project — Group 08
 
-This repository combines all three group tasks into one application:
+Merged Task 1 (auth/workspaces), Task 2 (projects/comments), and Task 3 (Kanban board).
 
-| Module | Folder | Features |
-|--------|--------|----------|
-| **Task 1** | `TASK1/` | User registration/login, workspaces, invite codes, member management |
-| **Task 2** | `TASK2/` | Project CRUD, archiving, comments API, activity feed |
-| **Task 3** | `task3/` | Kanban board, drag-and-drop task status, task creation |
+## Database (final)
 
-## Setup
+Import **`project_management.sql`** at the project root into MySQL. Database name: `project_management`.
 
-1. Copy the project into your XAMPP `htdocs` folder (e.g. `htdocs/Web-Technologies-Project_Group-08`).
-2. Start **Apache** and **MySQL** in XAMPP.
-3. Import `project_management.sql` into phpMyAdmin (database name: `project_management`).
-4. Open `http://localhost/Web-Technologies-Project_Group-08/` — you will be redirected to Task 1 login.
+### Demo users
 
-Default MySQL: user `root`, empty password. The app tries ports **3306** and **3307**.
+| Name   | Email              | Password  |
+|--------|--------------------|-----------|
+| Mim    | mim@gmail.com      | mim0@     |
+| sinha  | sinha@gmail.com    | sinha0    |
+| mohini | mohini@gmail.com   | mohini0   |
 
-## Flow
+All three belong to workspace **Group 08 Workspace** (invite code: `GRP08A`).
 
-1. **Register / log in** (`TASK1/`) and select or create a workspace.
-2. **Dashboard** shows projects for the active workspace (Task 2 data).
-3. **Open Board** opens the Kanban view (Task 3) for that project.
-4. **Task details** (from a card title on the board) opens comments (Task 2).
-5. **Activity feed** is available from project detail pages.
+Active projects (not archived): Aqua (12), Wastewise (13), SafeRoute (14), Meditrack (15). Sample tasks are included for the board.
 
-Sessions are shared across all three modules when served from the same app folder path.
+## Setup (XAMPP)
 
-## Structure
+1. Copy this folder to `htdocs/Web-Technologies-Project_Group-08`
+2. Start **Apache** and **MySQL**
+3. Import `project_management.sql` in phpMyAdmin, or visit  
+   http://localhost/Web-Technologies-Project_Group-08/setup-database.php
+4. Open http://localhost/Web-Technologies-Project_Group-08/
 
-```
-├── TASK1/          # Auth & workspaces
-├── TASK2/          # Projects, comments, activity
-├── task3/          # Kanban board
-├── config/app.php  # Shared session & URL helpers
-├── index.php       # Entry redirect → TASK1
-└── project_management.sql
-```
+## App flow
+
+1. Log in (Task 1)
+2. Dashboard → projects (Task 2)
+3. **Open Board** → Kanban (Task 3)
+
+Sessions are shared across `TASK1/`, `TASK2/`, and `task3/`.

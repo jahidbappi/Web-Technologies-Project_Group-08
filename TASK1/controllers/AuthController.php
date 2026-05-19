@@ -84,9 +84,16 @@ function handleLogin(): void {
     $_SESSION['name'] = $user['name'];
     $_SESSION['workspace_id'] = !empty($workspaces) ? (int)$workspaces[0]['id'] : null;
 
-    // Redirect: if user has a ws>>> dashboard, else..choose ws
+    require_once dirname(__DIR__, 2) . '/config/app.php';
+    $return = auth_safe_return_url($_POST['return'] ?? $_GET['return'] ?? null);
+    if ($return) {
+        header('Location: ' . $return);
+        exit();
+    }
+
     $next = empty($workspaces) ? 'choose_workspace' : 'dashboard';
-    header("Location: index.php?page=$next"); exit();
+    header("Location: index.php?page=$next");
+    exit();
 }
 
 //tata bye bye

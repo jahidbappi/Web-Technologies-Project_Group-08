@@ -3,7 +3,10 @@
 require_once __DIR__ . '/Database.php';
 
 function requireAuth(): void {
-    if (session_status() === PHP_SESSION_NONE) session_start();
+    if (!function_exists('app_session_start')) {
+        require_once dirname(__DIR__, 2) . '/config/app.php';
+    }
+    app_session_start();
     if (empty($_SESSION['user_id'])) {
         header('Location: index.php?page=login');
         exit();

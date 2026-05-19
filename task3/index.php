@@ -1,8 +1,7 @@
 <?php
+
 require_once dirname(__DIR__) . '/config/app.php';
 app_session_start();
-require_once __DIR__ . '/config/helpers.php';
-require_once __DIR__ . '/config/auth.php';
 
 $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 if ($method === 'POST' && !empty($_POST['_method'])) {
@@ -10,12 +9,21 @@ if ($method === 'POST' && !empty($_POST['_method'])) {
 }
 
 $route = isset($_GET['route']) ? trim((string)$_GET['route']) : '';
+if ($route === '') {
+    $route = 'projects';
+}
 
-/* Bare index.php visit → send user to the project list. */
-if ($route === '' && $method === 'GET') {
-    header('Location: ' . route('projects'));
+$needsAuth = ($route !== 'logout');
+
+if ($needsAuth && empty($_SESSION['user_id'])) {
+    require_once __DIR__ . '/config/helpers.php';
+    $return = $_SERVER['REQUEST_URI'] ?? route('projects');
+    header('Location: ' . app_url('TASK1/index.php?page=login&return=' . rawurlencode($return)));
     exit;
 }
+
+require_once __DIR__ . '/config/helpers.php';
+require_once __DIR__ . '/config/auth.php';
 
 function dispatch(string $controllerClass, string $action, array $params = []): void {
     require_once __DIR__ . '/controllers/' . $controllerClass . '.php';
@@ -71,19 +79,11 @@ try {
 
     http_response_code(404);
     header('Content-Type: text/html; charset=utf-8');
-    echo '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-       . '<title>404</title>'
-       . '<style>body{font-family:system-ui,sans-serif;padding:48px;background:#0f172a;color:#e2e8f0}'
-       . 'a{color:#38bdf8}</style>'
-       . '<h1>404 — Not found</h1>'
-       . '<p>No handler for <code>' . e($method . ' route=' . ($route ?: '(empty)')) . '</code>.</p>'
-       . '<p><a href="' . e(route('projects')) . '">Back to projects</a></p>';
+    echo '<!doctype html><meta charset="utf-8"><title>404</title>';
+    echo '<p>No handler for <code>' . e($method . ' route=' . $route) . '</code>.</p>';
+    echo '<p><a href="' . e(route('projects')) . '">Back to projects</a></p>';
 } catch (Throwable $e) {
     http_response_code(500);
-    if (filter_var(getenv('APP_DEBUG'), FILTER_VALIDATE_BOOLEAN)) {
-        echo '<pre style="padding:24px;font-family:monospace;color:#fca5a5">' . e($e->getMessage()) . '</pre>';
-    } else {
-        echo 'Internal server error.';
-    }
     error_log((string)$e);
+    echo 'Internal server error.';
 }
